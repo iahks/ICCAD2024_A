@@ -1,0 +1,3 @@
+read_verilog netlists/design1.v
+strash
+write_verilog temp.aig

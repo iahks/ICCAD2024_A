@@ -1,0 +1,102 @@
+// Benchmark "top_809960632_810038711_1598227639_893650103" written by ABC on Tue Aug 13 23:04:01 2024
+
+module top_809960632_810038711_1598227639_893650103 ( 
+    n2, n4, n12, n18, n22, n34, n35, n51, n57, n67, n72, n75, n78, n80,
+    n6, n9, n42, n48, n56, n65, n68, n77  );
+  input  n2, n4, n12, n18, n22, n34, n35, n51, n57, n67, n72, n75, n78,
+    n80;
+  output n6, n9, n42, n48, n56, n65, n68, n77;
+  wire new_n23, new_n24, new_n25, new_n26, new_n27, new_n28, new_n29,
+    new_n30, new_n31, new_n32, new_n33, new_n34_1, new_n35_1, new_n36,
+    new_n38, new_n39, new_n40, new_n41, new_n42_1, new_n43, new_n44,
+    new_n45, new_n46, new_n47, new_n48_1, new_n49, new_n50, new_n51_1,
+    new_n52, new_n53, new_n54, new_n55, new_n56_1, new_n57_1, new_n58,
+    new_n59, new_n60, new_n61, new_n62, new_n63, new_n64, new_n66,
+    new_n67_1, new_n68_1, new_n69, new_n70, new_n71, new_n72_1, new_n74,
+    new_n75_1, new_n76, new_n77_1, new_n78_1, new_n79, new_n80_1, new_n81,
+    new_n82, new_n83, new_n84, new_n86, new_n87, new_n88, new_n89, new_n90,
+    new_n91, new_n92, new_n93, new_n94, new_n96, new_n98, new_n99,
+    new_n101;
+  assign new_n23 = ~n12 & n51;
+  assign new_n24 = n67 & ~n78;
+  assign new_n25 = ~n67 & ~n80;
+  assign new_n26 = n22 & ~new_n25;
+  assign new_n27 = ~new_n24 & new_n26;
+  assign new_n28 = n67 & n72;
+  assign new_n29 = ~n67 & n75;
+  assign new_n30 = ~n22 & ~new_n29;
+  assign new_n31 = ~new_n28 & new_n30;
+  assign new_n32 = ~new_n27 & ~new_n31;
+  assign new_n33 = new_n27 & new_n31;
+  assign new_n34_1 = ~new_n32 & ~new_n33;
+  assign new_n35_1 = new_n23 & new_n34_1;
+  assign new_n36 = ~new_n23 & ~new_n34_1;
+  assign n6 = ~new_n35_1 & ~new_n36;
+  assign new_n38 = n2 & ~n78;
+  assign new_n39 = ~n2 & ~n80;
+  assign new_n40 = n18 & ~new_n39;
+  assign new_n41 = ~new_n38 & new_n40;
+  assign new_n42_1 = n51 & ~new_n27;
+  assign new_n43 = ~new_n41 & new_n42_1;
+  assign new_n44 = n2 & n72;
+  assign new_n45 = ~n2 & n75;
+  assign new_n46 = ~n18 & ~new_n45;
+  assign new_n47 = ~new_n44 & new_n46;
+  assign new_n48_1 = new_n31 & ~new_n41;
+  assign new_n49 = ~new_n47 & ~new_n48_1;
+  assign new_n50 = ~new_n43 & new_n49;
+  assign new_n51_1 = ~n12 & ~new_n50;
+  assign new_n52 = n57 & ~n78;
+  assign new_n53 = ~n57 & ~n80;
+  assign new_n54 = n34 & ~new_n53;
+  assign new_n55 = ~new_n52 & new_n54;
+  assign new_n56_1 = n57 & n72;
+  assign new_n57_1 = ~n57 & n75;
+  assign new_n58 = ~n34 & ~new_n57_1;
+  assign new_n59 = ~new_n56_1 & new_n58;
+  assign new_n60 = ~new_n55 & ~new_n59;
+  assign new_n61 = new_n55 & new_n59;
+  assign new_n62 = ~new_n60 & ~new_n61;
+  assign new_n63 = ~new_n51_1 & new_n62;
+  assign new_n64 = new_n51_1 & ~new_n62;
+  assign n9 = new_n63 | new_n64;
+  assign new_n66 = ~new_n31 & ~new_n42_1;
+  assign new_n67_1 = ~n12 & ~new_n66;
+  assign new_n68_1 = new_n41 & new_n47;
+  assign new_n69 = ~new_n41 & ~new_n47;
+  assign new_n70 = ~new_n68_1 & ~new_n69;
+  assign new_n71 = ~new_n67_1 & new_n70;
+  assign new_n72_1 = new_n67_1 & ~new_n70;
+  assign n42 = new_n71 | new_n72_1;
+  assign new_n74 = n4 & n72;
+  assign new_n75_1 = ~n4 & n75;
+  assign new_n76 = ~n35 & ~new_n75_1;
+  assign new_n77_1 = ~new_n74 & new_n76;
+  assign new_n78_1 = n4 & ~n78;
+  assign new_n79 = ~n4 & ~n80;
+  assign new_n80_1 = n35 & ~new_n79;
+  assign new_n81 = ~new_n78_1 & new_n80_1;
+  assign new_n82 = ~new_n49 & ~new_n55;
+  assign new_n83 = ~new_n59 & ~new_n82;
+  assign new_n84 = ~new_n81 & ~new_n83;
+  assign n48 = ~new_n77_1 & ~new_n84;
+  assign new_n86 = n6 & n42;
+  assign new_n87 = new_n43 & ~new_n55;
+  assign new_n88 = new_n83 & ~new_n87;
+  assign new_n89 = ~n12 & ~new_n88;
+  assign new_n90 = new_n77_1 & ~new_n81;
+  assign new_n91 = ~new_n77_1 & new_n81;
+  assign new_n92 = ~new_n90 & ~new_n91;
+  assign new_n93 = ~new_n89 & ~new_n92;
+  assign new_n94 = new_n89 & new_n92;
+  assign n65 = new_n93 | new_n94;
+  assign new_n96 = n9 & n65;
+  assign n56 = new_n86 & new_n96;
+  assign new_n98 = ~new_n55 & ~new_n81;
+  assign new_n99 = ~new_n27 & ~new_n41;
+  assign n77 = ~new_n98 | ~new_n99;
+  assign new_n101 = n51 & ~n77;
+  assign n68 = ~n48 | new_n101;
+endmodule
+
+

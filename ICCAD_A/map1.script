@@ -1,0 +1,7 @@
+read_library ./genlibs/genlib_neighbor.genlib
+read_verilog temp.aig
+strash
+&get
+&choice
+map -a
+write_verilog ./netlists/mapped_neighbor_design.v

@@ -151,7 +151,7 @@ while time.time() - start_time < time_limit:
 
 
     output = subprocess.check_output(["./abc", "-f", "./map1.script"])
-    output = subprocess.check_output([e, "-library", lib, "-netlist", "./netlists/mapped_neighbor_design.v", "-output", "./neighbor.out"])
+    output = subprocess.check_output([e, "-library", lib, "-netlist", "./netlists/mapped_neighbor_design.v", "-output", "./design.out"])
     o = float(output.decode().split(' ')[2][:-1])
 
     # decide to move or stay

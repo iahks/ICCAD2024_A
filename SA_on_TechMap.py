@@ -10,7 +10,7 @@ import time
 # argument settings
 
 start_time = time.time()
-time_limit = 300 # * 60
+time_limit = 3600 # one hour
 
 if len(sys.argv) != 8:
     print("Usage: SA_on_Techmap.py <estimator> <lib_file> <genlib_file> <min_cost> <output.v> <area_only> <deepsyn>")
@@ -46,7 +46,7 @@ def get_neighbor(input, step = 0.1):
 
 best, best_val = genlib.copy(), min_cost
 genlib_val = best_val
-temp = min_cost
+temp = 75 # min_cost
 
 if(area_only=="False" and deepsyn=="False"):
     with open(f'./map1.script', 'w') as file:
@@ -120,11 +120,12 @@ while time.time() - start_time < time_limit:
 
     # making a step
 
-    r = random.randint(0, len(genlib) * 5 - 1)
-    gc = list(genlib.keys())[r // 5]    # gate changed
-    n = get_neighbor(genlib[gc][r % 5])
+    r = random.sample(range(len(genlib) * 5), 5) # pick 5 unique numbers
+    gc = list(map(lambda x: list(genlib.keys())[x // 5], r))    # gate changed
+    n = list(map(lambda x, y: get_neighbor(genlib[y][x % 5]), r, gc))
     genlib_n = genlib.copy()    # neighbor genlib
-    genlib_n[gc][r % 5] = n
+    for i in range(0, 5): 
+        genlib_n[gc[i]][r[i] % 5] = n[i]
 
     # write a new genlib
 
@@ -157,6 +158,9 @@ while time.time() - start_time < time_limit:
     # decide to move or stay
 
     if o < best_val or random.random() < math.exp((genlib_val - o) / t): 
+        uphill = False
+        if genlib_val - o < 0: 
+            uphill = True
         genlib.clear()
         genlib = genlib_n
         genlib_val = o
@@ -166,12 +170,14 @@ while time.time() - start_time < time_limit:
             with open(output_v, 'w') as destination_file:
                 destination_file.write(content)
 
-            print("Step:", s, "Cost:", o, gc, r%5, n)
-            check = subprocess.check_output([e, "-library", lib, "-netlist", output_v, "-output", "./neighbor.out"])
-            c = float(check.decode().split(' ')[2][:-1])
-            print("netlist cost:", c)
+            print("Downhill! @ Step:", s, "Cost:", o) #, gc, r%5, n)
+            # check = subprocess.check_output([e, "-library", lib, "-netlist", output_v, "-output", "./neighbor.out"])
+            # c = float(check.decode().split(' ')[2][:-1])
+            # print("netlist cost:", c)
             best.clear()
             best = genlib_n
             best_val = o
+        elif uphill: 
+            print("Uphill: Step: ", s, "Cost: ", genlib_val, "t:", t)
     if s % 10 == 0: 
         print("Step:", s, best_val, genlib_val)

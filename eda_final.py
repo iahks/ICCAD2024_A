@@ -90,7 +90,7 @@ for g in gates:
 # print(cost)
 
 import numpy as np
-import pandas as pd
+# import pandas as pd
 
 
 
@@ -108,89 +108,89 @@ for i in range(data_num+1):
         else:
           data[j][i] = cost[gates[j]][0] # Assume take cost_estimator_1 ## Only for trying all estimators, Only one estimator in this case
 
-attributes.append('cost')
-df = pd.DataFrame(np.array(data), columns=attributes)
-
-# print(data)
-print(df)
-
-correlation = []
-
-for attr in attributes:
-  if attr != 'cost':
-    correlation.append(df[attr].corr(df.cost))
-
-print(correlation)
-
-data_chosen = []
-
-for i in range(3):
-  data_chosen.append(attributes[correlation.index(sorted(correlation)[-1*(i+1)])])
-
-print(data_chosen)
-
-import itertools
-
 num_genlib = 0
-permutations = list(itertools.permutations([0, 1, 2], 3))
+# attributes.append('cost')
+# df = pd.DataFrame(np.array(data), columns=attributes)
 
-for min_corr in range(0, 6, 1):
+# # print(data)
+# print(df)
 
-  min_corr = min_corr / 10
+# correlation = []
 
-  for perm in permutations:
+# for attr in attributes:
+#   if attr != 'cost':
+#     correlation.append(df[attr].corr(df.cost))
 
-    with open(f'./genlibs/genlib{num_genlib}.genlib', 'w') as file:
+# print(correlation)
 
-      for i in range(len(gates)):
+# data_chosen = []
 
-        g = gates[i]
-        cell_area = lib["cells"][i][data_chosen[perm[0]]] if df[data_chosen[perm[0]]].corr(df.cost) > min_corr else 1
-        block_delay = lib["cells"][i][data_chosen[perm[1]]] if df[data_chosen[perm[1]]].corr(df.cost) > min_corr else 1
-        fanout_delay = lib["cells"][i][data_chosen[perm[2]]] if df[data_chosen[perm[2]]].corr(df.cost) > min_corr else 0.2
+# for i in range(3):
+#   data_chosen.append(attributes[correlation.index(sorted(correlation)[-1*(i+1)])])
 
-        if g.split('_')[0] == 'and':
-          file.write(f'GATE {g} {cell_area} Y=A*B; \n PIN *   NONINV 1 999 {block_delay} {fanout_delay} {block_delay} {fanout_delay} \n')
-        elif g.split('_')[0] == 'or':
-          file.write(f'GATE {g} {cell_area} Y=A+B; \n PIN *   NONINV 1 999 {block_delay} {fanout_delay} {block_delay} {fanout_delay} \n')
-        elif g.split('_')[0] == 'nand':
-          file.write(f'GATE {g} {cell_area} Y=!(A*B); \n PIN *   INV 1 999 {block_delay} {fanout_delay} {block_delay} {fanout_delay} \n')
-        elif g.split('_')[0] == 'nor':
-          file.write(f'GATE {g} {cell_area} Y=!(A+B); \n PIN *   INV 1 999 {block_delay} {fanout_delay} {block_delay} {fanout_delay} \n')
-        elif g.split('_')[0] == 'not':
-          file.write(f'GATE {g} {cell_area} Y=!A; \n PIN *   INV 1 999 {block_delay} {fanout_delay} {block_delay} {fanout_delay} \n')
-        elif g.split('_')[0] == 'buf':
-          file.write(f'GATE {g} {cell_area} Y=A; \n PIN *   NONINV 1 999 {block_delay} {fanout_delay} {block_delay} {fanout_delay} \n')
-        elif g.split('_')[0] == 'xor':
-          file.write(f'GATE {g} {cell_area} Y=!A*B+A*!B; \n PIN *   UNKNOWN 1 999 {block_delay} {fanout_delay} {block_delay} {fanout_delay} \n')
-        elif g.split('_')[0] == 'xnor':
-          file.write(f'GATE {g} {cell_area} Y=!A*!B+A*B; \n PIN *   UNKNOWN 1 999 {block_delay} {fanout_delay} {block_delay} {fanout_delay} \n')
+# print(data_chosen)
 
-      num_genlib += 1
+# import itertools
 
-with open(f'./genlibs/genlib{num_genlib}.genlib', 'w') as file:
-  for i in range(len(gates)):
-    g = gates[i]
-    cell_area = lib["cells"][i][data_chosen[perm[0]]]
-    if g.split('_')[0] == 'and':
-      file.write(f'GATE {g} {cell_area} Y=A*B; \n PIN *   NONINV 1 999 1 0.2 1 0.2 \n')
-    elif g.split('_')[0] == 'or':
-      file.write(f'GATE {g} {cell_area} Y=A+B; \n PIN *   NONINV 1 999 1 0.2 1 0.2 \n')
-    elif g.split('_')[0] == 'nand':
-      file.write(f'GATE {g} {cell_area} Y=!(A*B); \n PIN *   INV 1 999 1 0.2 1 0.2 \n')
-    elif g.split('_')[0] == 'nor':
-      file.write(f'GATE {g} {cell_area} Y=!(A+B); \n PIN *   INV 1 999 1 0.2 1 0.2 \n')
-    elif g.split('_')[0] == 'not':
-      file.write(f'GATE {g} {cell_area} Y=!A; \n PIN *   INV 1 999 1 0.2 1 0.2 \n')
-    elif g.split('_')[0] == 'buf':
-      file.write(f'GATE {g} {cell_area} Y=A; \n PIN *   NONINV 1 999 1 0.2 1 0.2 \n')
-    elif g.split('_')[0] == 'xor':
-      file.write(f'GATE {g} {cell_area} Y=!A*B+A*!B; \n PIN *   UNKNOWN 1 999 1 0.2 1 0.2 \n')
-    elif g.split('_')[0] == 'xnor':
-      file.write(f'GATE {g} {cell_area} Y=!A*!B+A*B; \n PIN *   UNKNOWN 1 999 1 0.2 1 0.2 \n')
-num_genlib += 1
+# permutations = list(itertools.permutations([0, 1, 2], 3))
 
-print(f'{num_genlib} genlib flies are generated')
+# for min_corr in range(0, 6, 1):
+
+#   min_corr = min_corr / 10
+
+#   for perm in permutations:
+
+#     with open(f'./genlibs/genlib{num_genlib}.genlib', 'w') as file:
+
+#       for i in range(len(gates)):
+
+#         g = gates[i]
+#         cell_area = lib["cells"][i][data_chosen[perm[0]]] if df[data_chosen[perm[0]]].corr(df.cost) > min_corr else 1
+#         block_delay = lib["cells"][i][data_chosen[perm[1]]] if df[data_chosen[perm[1]]].corr(df.cost) > min_corr else 1
+#         fanout_delay = lib["cells"][i][data_chosen[perm[2]]] if df[data_chosen[perm[2]]].corr(df.cost) > min_corr else 0.2
+
+#         if g.split('_')[0] == 'and':
+#           file.write(f'GATE {g} {cell_area} Y=A*B; \n PIN *   NONINV 1 999 {block_delay} {fanout_delay} {block_delay} {fanout_delay} \n')
+#         elif g.split('_')[0] == 'or':
+#           file.write(f'GATE {g} {cell_area} Y=A+B; \n PIN *   NONINV 1 999 {block_delay} {fanout_delay} {block_delay} {fanout_delay} \n')
+#         elif g.split('_')[0] == 'nand':
+#           file.write(f'GATE {g} {cell_area} Y=!(A*B); \n PIN *   INV 1 999 {block_delay} {fanout_delay} {block_delay} {fanout_delay} \n')
+#         elif g.split('_')[0] == 'nor':
+#           file.write(f'GATE {g} {cell_area} Y=!(A+B); \n PIN *   INV 1 999 {block_delay} {fanout_delay} {block_delay} {fanout_delay} \n')
+#         elif g.split('_')[0] == 'not':
+#           file.write(f'GATE {g} {cell_area} Y=!A; \n PIN *   INV 1 999 {block_delay} {fanout_delay} {block_delay} {fanout_delay} \n')
+#         elif g.split('_')[0] == 'buf':
+#           file.write(f'GATE {g} {cell_area} Y=A; \n PIN *   NONINV 1 999 {block_delay} {fanout_delay} {block_delay} {fanout_delay} \n')
+#         elif g.split('_')[0] == 'xor':
+#           file.write(f'GATE {g} {cell_area} Y=!A*B+A*!B; \n PIN *   UNKNOWN 1 999 {block_delay} {fanout_delay} {block_delay} {fanout_delay} \n')
+#         elif g.split('_')[0] == 'xnor':
+#           file.write(f'GATE {g} {cell_area} Y=!A*!B+A*B; \n PIN *   UNKNOWN 1 999 {block_delay} {fanout_delay} {block_delay} {fanout_delay} \n')
+
+#       num_genlib += 1
+
+# with open(f'./genlibs/genlib{num_genlib}.genlib', 'w') as file:
+#   for i in range(len(gates)):
+#     g = gates[i]
+#     cell_area = lib["cells"][i][data_chosen[perm[0]]]
+#     if g.split('_')[0] == 'and':
+#       file.write(f'GATE {g} {cell_area} Y=A*B; \n PIN *   NONINV 1 999 1 0.2 1 0.2 \n')
+#     elif g.split('_')[0] == 'or':
+#       file.write(f'GATE {g} {cell_area} Y=A+B; \n PIN *   NONINV 1 999 1 0.2 1 0.2 \n')
+#     elif g.split('_')[0] == 'nand':
+#       file.write(f'GATE {g} {cell_area} Y=!(A*B); \n PIN *   INV 1 999 1 0.2 1 0.2 \n')
+#     elif g.split('_')[0] == 'nor':
+#       file.write(f'GATE {g} {cell_area} Y=!(A+B); \n PIN *   INV 1 999 1 0.2 1 0.2 \n')
+#     elif g.split('_')[0] == 'not':
+#       file.write(f'GATE {g} {cell_area} Y=!A; \n PIN *   INV 1 999 1 0.2 1 0.2 \n')
+#     elif g.split('_')[0] == 'buf':
+#       file.write(f'GATE {g} {cell_area} Y=A; \n PIN *   NONINV 1 999 1 0.2 1 0.2 \n')
+#     elif g.split('_')[0] == 'xor':
+#       file.write(f'GATE {g} {cell_area} Y=!A*B+A*!B; \n PIN *   UNKNOWN 1 999 1 0.2 1 0.2 \n')
+#     elif g.split('_')[0] == 'xnor':
+#       file.write(f'GATE {g} {cell_area} Y=!A*!B+A*B; \n PIN *   UNKNOWN 1 999 1 0.2 1 0.2 \n')
+# num_genlib += 1
+
+# print(f'{num_genlib} genlib flies are generated')
 
 with open(f'./genlibs/genlib{num_genlib}.genlib', 'w') as file:
 
@@ -252,4 +252,4 @@ with open(f'./genlibs/genlib{num_genlib}.genlib', 'w') as file:
 
   num_genlib += 1
 
-print(f'genlib flie with data_1 and data_6 is generated')
+print(f'genlib flie with attributes is generated')

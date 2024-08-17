@@ -25,8 +25,8 @@ output_v = sys.argv[5]
 area_only = sys.argv[6]
 deepsyn = sys.argv[7]
 
-print(area_only)
-print(deepsyn)
+# print(area_only)
+# print(deepsyn)
 
 # parsor: genlib to dictionary
 
@@ -47,6 +47,71 @@ def get_neighbor(input, step = 0.1):
 best, best_val = genlib.copy(), min_cost
 genlib_val = best_val
 temp = min_cost
+
+if(area_only=="False" and deepsyn=="False"):
+    with open(f'./map1.script', 'w') as file:
+        file.write("""read_library ./genlibs/genlib_neighbor.genlib
+read_verilog temp.aig
+strash
+choice
+map
+choice
+map
+choice
+map
+choice
+map
+choice
+map
+write_verilog ./netlists/mapped_neighbor_design.v""")
+elif(area_only=="True" and deepsyn=="False"):
+    with open(f'./map1.script', 'w') as file:
+        file.write("""read_library ./genlibs/genlib_neighbor.genlib
+read_verilog temp.aig
+strash
+choice
+map -a
+choice
+map -a
+choice
+map -a
+choice
+map -a
+choice
+map -a
+write_verilog ./netlists/mapped_neighbor_design.v""")
+elif(area_only=="False" and deepsyn=="True"):
+    with open(f'./map1.script', 'w') as file:
+        file.write("""read_library ./genlibs/genlib_neighbor.genlib
+read_verilog dsyn_temp.aig
+strash
+choice
+map 
+choice
+map 
+choice
+map 
+choice
+map 
+choice
+map 
+write_verilog ./netlists/mapped_neighbor_design.v""")
+else:
+    with open(f'./map1.script', 'w') as file:
+        file.write("""read_library ./genlibs/genlib_neighbor.genlib
+read_verilog dsyn_temp.aig
+strash
+choice
+map -a
+choice
+map -a
+choice
+map -a
+choice
+map -a
+choice
+map -a
+write_verilog ./netlists/mapped_neighbor_design.v""")
 
 s = 0
 while time.time() - start_time < time_limit:
@@ -83,73 +148,10 @@ while time.time() - start_time < time_limit:
                 file.write(f'GATE {g} {genlib_n[g][0]} Y=!A*!B+A*B; \n PIN *   UNKNOWN 1 999 {genlib_n[g][1]} {genlib_n[g][2]} {genlib_n[g][3]} {genlib_n[g][4]} \n')
 
     # run abc and cost estimator
-    if(area_only=="False" and deepsyn=="False"):
-        with open(f'./map1.script', 'w') as file:
-            file.write("""read_library ./genlibs/genlib_neighbor.genlib
-read_verilog temp.aig
-strash
-choice
-map
-choice
-map
-choice
-map
-choice
-map
-choice
-map
-write_verilog ./netlists/mapped_neighbor_design.v""")
-    elif(area_only=="True" and deepsyn=="False"):
-        with open(f'./map1.script', 'w') as file:
-            file.write("""read_library ./genlibs/genlib_neighbor.genlib
-read_verilog temp.aig
-strash
-choice
-map -a
-choice
-map -a
-choice
-map -a
-choice
-map -a
-choice
-map -a
-write_verilog ./netlists/mapped_neighbor_design.v""")
-    elif(area_only=="False" and deepsyn=="True"):
-        with open(f'./map1.script', 'w') as file:
-            file.write("""read_library ./genlibs/genlib_neighbor.genlib
-read_verilog dsyn_temp.aig
-strash
-choice
-map 
-choice
-map 
-choice
-map 
-choice
-map 
-choice
-map 
-write_verilog ./netlists/mapped_neighbor_design.v""")
-    else:
-        with open(f'./map1.script', 'w') as file:
-            file.write("""read_library ./genlibs/genlib_neighbor.genlib
-read_verilog dsyn_temp.aig
-strash
-choice
-map -a
-choice
-map -a
-choice
-map -a
-choice
-map -a
-choice
-map -a
-write_verilog ./netlists/mapped_neighbor_design.v""")
+
 
     output = subprocess.check_output(["./abc", "-f", "./map1.script"])
-    output = subprocess.check_output([e, "-library", lib, "-netlist", "./netlists/mapped_neighbor_design.v", "-output", "./neighbor.out"])
+    output = subprocess.check_output([e, "-library", lib, "-netlist", "./netlists/mapped_neighbor_design.v", "-output", "./design.out"])
     o = float(output.decode().split(' ')[2][:-1])
 
     # decide to move or stay

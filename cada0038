@@ -43,11 +43,9 @@ echo "$script_aig" > aig.script
 ./abc -f aig.script
 
 # go through genlibs
-for i in {37..38}; do
-    ## need to change for different estimators  e.g. lib/genlib7/  for cost_estimator 7
+for i in {0..1}; do
     genlib_file="genlibs/genlib${i}.genlib"   
     mapped_netlist="netlists/mapped_design${i}.v"
-    out_file="design1${i}.out"
     
     # map1.script for abc to use
     script_content=$(cat <<EOF
@@ -99,12 +97,10 @@ EOF
     fi
 done
 
-for i in {76..77}; do
-    ## need to change for different estimators  e.g. lib/genlib7/  for cost_estimator 7
-    j=$((i-39))
-    genlib_file="genlibs/genlib${j}.genlib"   
-    mapped_netlist="netlists/mapped_design${i}.v"
-    out_file="design1${i}.out"
+for i in {0..1}; do
+    j=$((i+2))
+    genlib_file="genlibs/genlib${i}.genlib"   
+    mapped_netlist="netlists/mapped_design${j}.v"
     
     # map1.script for abc to use
     script_content=$(cat <<EOF
@@ -161,7 +157,7 @@ done
 read_verilog ${netlist}
 strash
 &get
-&deepsyn -T 300 -v
+&deepsyn -T 3 -v
 &put
 write_verilog dsyn_temp.aig
 EOF
@@ -171,11 +167,10 @@ echo "$script_aig" > aig.script
 ./abc -f aig.script
 
 # go through genlibs
-for i in {37..38}; do
-    ## need to change for different estimators  e.g. lib/genlib7/  for cost_estimator 7
+for i in {0..1}; do
+    j=$((i+4))
     genlib_file="genlibs/genlib${i}.genlib"   
-    mapped_netlist="netlists/mapped_design${i}.v"
-    out_file="design1${i}.out"
+    mapped_netlist="netlists/mapped_design${j}.v"
     
     # map1.script for abc to use
     script_content=$(cat <<EOF
@@ -228,12 +223,11 @@ EOF
     fi
 done
 
-for i in {76..77}; do
+for i in {0..1}; do
     ## need to change for different estimators  e.g. lib/genlib7/  for cost_estimator 7
-    j=$((i-39))
-    genlib_file="genlibs/genlib${j}.genlib"   
-    mapped_netlist="netlists/mapped_design${i}.v"
-    out_file="design1${i}.out"
+    j=$((i+6))
+    genlib_file="genlibs/genlib${i}.genlib"   
+    mapped_netlist="netlists/mapped_design${j}.v"
     
     # map1.script for abc to use
     script_content=$(cat <<EOF
@@ -288,12 +282,11 @@ done
 
 echo "Minimum cost before SA: $min_cost"
 
-python3 SA_on_TechMap.py "$cost_function" "$library" "$best_genlib" "$min_cost" "$best_mapped_netlist" $area_only $deepsyn
-
-
-
+rm map1.script
 # record best mapped netlist
 cp $best_mapped_netlist $output
+
+python3 SA_on_TechMap.py "$cost_function" "$library" "$best_genlib" "$min_cost" "$output" $area_only $deepsyn
 min_cost=$($cost_function -library lib/lib1.json -netlist $output -output design.out)
 
 # delete unuseful files
@@ -303,10 +296,10 @@ rm design.out
 rm temp.aig
 rm dsyn_temp.aig
 rm ./netlists/mapped_neighbor_design.v
-for i in {0..77}; do
+rm ./genlibs/genlib_neighbor.genlib
+for i in {0..7}; do
 rm netlists/mapped_design${i}.v
 done
-rm $best_mapped_netlist
 
 
 

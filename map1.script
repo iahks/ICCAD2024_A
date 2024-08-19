@@ -1,0 +1,29 @@
+read_library genlibs/genlib2.genlib
+read_verilog temp.aig
+strash
+choice
+map
+choice
+map
+choice
+map
+choice
+map
+choice
+map
+# &get
+# &choice
+# map
+# &get
+# &choice
+# map
+# &get
+# &choice
+# map
+# &get
+# &choice
+# map
+# &get
+# &choice
+# map
+write_verilog netlists/mapped_design5.v

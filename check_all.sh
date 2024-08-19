@@ -1,3 +1,9 @@
+
+if [ "$#" -ne 2 ]; then
+    echo "Usage: ./check_all.sh -cost_function <cost_function>"
+    exit 1
+fi
+
 cost_function=""
 while [[ "$#" -gt 0 ]]; do
     case $1 in

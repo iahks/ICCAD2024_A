@@ -4,18 +4,12 @@ import sys
 import json
 import re
 
-# Read tested Estimators and Gates
 if len(sys.argv) != 4:
     print("Usage: eda_final.py <estimator> <lib_file> <netlist>")
     sys.exit(1)
 
 estimator = sys.argv[1]
 library = sys.argv[2]
-
-# with open("./estimator.txt", "r") as f:
-#   estimators = f.read().splitlines()
-# with open("./gate.txt", "r") as f:
-#   gates = f.read().splitlines()
 
 netlist_file_path = sys.argv[3]  # Update with the correct path if needed
 with open(netlist_file_path, 'r') as file:

@@ -2,6 +2,7 @@ import random, math
 import subprocess
 import sys
 import time
+import numpy as np
 
 # def print_dict(d): 
 #     for i in d: 
@@ -9,8 +10,9 @@ import time
 
 # argument settings
 
+random.seed(38) # 0038
 start_time = time.time()
-time_limit = 3600 # one hour
+time_limit = 1800 # half an hour
 
 if len(sys.argv) != 8:
     print("Usage: SA_on_Techmap.py <estimator> <lib_file> <genlib_file> <min_cost> <output.v> <area_only> <deepsyn>")
@@ -46,7 +48,7 @@ def get_neighbor(input, step = 0.1):
 
 best, best_val = genlib.copy(), min_cost
 genlib_val = best_val
-temp = 75 # min_cost
+# temp = 75 # initial cost
 
 if(area_only=="False" and deepsyn=="False"):
     with open(f'./map1.script', 'w') as file:
@@ -114,17 +116,33 @@ map -a
 write_verilog ./netlists/mapped_neighbor_design.v""")
 
 s = 0
+d_avg = -5.4
+P = 0.99
+t1 = d_avg / np.log(P)
+cost = 3
+c = 100
+k = 10
+
+nbrstp = round(len(genlib) / 4) # neighbor step
+print(nbrstp)
+
 while time.time() - start_time < time_limit:
-    t = temp / float(s + 1)
     s += 1
-
+    if s == 1: 
+        t = t1
+    elif s <= k: 
+        t = t1 * cost / (s * c)
+    else: 
+        t = t1 * cost / s
+    print("s:", s, "t:", t)
+    
     # making a step
-
-    r = random.sample(range(len(genlib) * 5), 5) # pick 5 unique numbers
+    
+    r = random.sample(range(len(genlib) * 5), nbrstp) # pick about 15 unique numbers
     gc = list(map(lambda x: list(genlib.keys())[x // 5], r))    # gate changed
-    n = list(map(lambda x, y: get_neighbor(genlib[y][x % 5]), r, gc))
+    n = list(map(lambda x, y: get_neighbor(genlib[y][x % 5], 0.3 if s > 20 else 0.1), r, gc))
     genlib_n = genlib.copy()    # neighbor genlib
-    for i in range(0, 5): 
+    for i in range(0, nbrstp): 
         genlib_n[gc[i]][r[i] % 5] = n[i]
 
     # write a new genlib
@@ -149,7 +167,6 @@ while time.time() - start_time < time_limit:
                 file.write(f'GATE {g} {genlib_n[g][0]} Y=!A*!B+A*B; \n PIN *   UNKNOWN 1 999 {genlib_n[g][1]} {genlib_n[g][2]} {genlib_n[g][3]} {genlib_n[g][4]} \n')
 
     # run abc and cost estimator
-
 
     output = subprocess.check_output(["./abc", "-f", "./map1.script"])
     output = subprocess.check_output(["./replace.sh", "-netlist", "./netlists/mapped_neighbor_design.v"])
@@ -177,5 +194,7 @@ while time.time() - start_time < time_limit:
             best_val = o
         elif uphill: 
             print("Uphill: Step: ", s, "Cost: ", genlib_val, "t:", t)
+    else: 
+        print("o: ", o)
     if s % 10 == 0: 
         print("Step:", s, best_val, genlib_val)

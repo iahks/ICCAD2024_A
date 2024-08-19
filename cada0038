@@ -298,8 +298,8 @@ min_cost=$($cost_function -library $library -netlist $output -output "design.out
 rm map1.script
 rm aig.script
 rm design.out
-rm temp.aig
-rm dsyn_temp.aig
+# rm temp.aig
+# rm dsyn_temp.aig
 rm ./netlists/mapped_neighbor_design.v
 rm ./genlibs/genlib_neighbor.genlib
 for i in {0..7}; do

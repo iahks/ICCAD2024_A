@@ -207,8 +207,10 @@ with open(f'./genlibs/genlib{num_genlib}.genlib', 'w') as file:
       file.write(f'GATE {g} {cell_area} Y=A+B; \n PIN *   NONINV 1 999 {block_delay} {fanout_delay} {block_delay} {fanout_delay} \n')
     elif g.split('_')[0] == 'nand':
       file.write(f'GATE {g} {cell_area} Y=!(A*B); \n PIN *   INV 1 999 {block_delay} {fanout_delay} {block_delay} {fanout_delay} \n')
+      file.write(f'GATE {"not_"+g} {cell_area} Y=!A; \n PIN *   INV 1 999 {block_delay} {fanout_delay} {block_delay} {fanout_delay} \n')
     elif g.split('_')[0] == 'nor':
       file.write(f'GATE {g} {cell_area} Y=!(A+B); \n PIN *   INV 1 999 {block_delay} {fanout_delay} {block_delay} {fanout_delay} \n')
+      file.write(f'GATE {"not_"+g} {cell_area} Y=!A; \n PIN *   INV 1 999 {block_delay} {fanout_delay} {block_delay} {fanout_delay} \n')
     elif g.split('_')[0] == 'not':
       file.write(f'GATE {g} {cell_area} Y=!A; \n PIN *   INV 1 999 {block_delay} {fanout_delay} {block_delay} {fanout_delay} \n')
     elif g.split('_')[0] == 'buf':
@@ -227,7 +229,10 @@ with open(f'./genlibs/genlib{num_genlib}.genlib', 'w') as file:
   for i in range(len(gates)):
 
     g = gates[i]
-    cell_area = cost[g][0] #data[i][3]*data[i][5]
+
+    area = data[i][5]
+    power = data[i][3]
+    cell_area = pow(area*power, 0.2)#0.1428) #cost[g][0] #
     block_delay = data[i][1] #+ data[i][0]*data[i][4]
     fanout_delay = data[i][0] * 0.002
     load = data[i][4]
@@ -239,8 +244,10 @@ with open(f'./genlibs/genlib{num_genlib}.genlib', 'w') as file:
       file.write(f'GATE {g} {cell_area} Y=A+B; \n PIN *   NONINV {load} {max_load} {block_delay} {fanout_delay} {block_delay} {fanout_delay} \n')
     elif g.split('_')[0] == 'nand':
       file.write(f'GATE {g} {cell_area} Y=!(A*B); \n PIN *   INV {load} {max_load} {block_delay} {fanout_delay} {block_delay} {fanout_delay} \n')
+      file.write(f'GATE {"not_"+g} {cell_area} Y=!A; \n PIN *   INV {load} {max_load} {block_delay} {fanout_delay} {block_delay} {fanout_delay} \n')
     elif g.split('_')[0] == 'nor':
       file.write(f'GATE {g} {cell_area} Y=!(A+B); \n PIN *   INV {load} {max_load} {block_delay} {fanout_delay} {block_delay} {fanout_delay} \n')
+      file.write(f'GATE {"not_"+g} {cell_area} Y=!A; \n PIN *   INV {load} {max_load} {block_delay} {fanout_delay} {block_delay} {fanout_delay} \n')
     elif g.split('_')[0] == 'not':
       file.write(f'GATE {g} {cell_area} Y=!A; \n PIN *   INV {load} {max_load} {block_delay} {fanout_delay} {block_delay} {fanout_delay} \n')
     elif g.split('_')[0] == 'buf':
@@ -252,4 +259,36 @@ with open(f'./genlibs/genlib{num_genlib}.genlib', 'w') as file:
 
   num_genlib += 1
 
-print(f'genlib flie with attributes is generated')
+with open(f'./genlibs/genlib{num_genlib}.genlib', 'w') as file:
+
+  for i in range(len(gates)):
+
+    g = gates[i]
+    cell_area = cost[g][0] #pow(data[i][3]*data[i][5], 0.1428) #
+    block_delay = data[i][1] #+ data[i][0]*data[i][4]
+    fanout_delay = data[i][0] * 0.002
+    load = data[i][4]
+    max_load = data[i][6]
+
+    if g.split('_')[0] == 'and':
+      file.write(f'GATE {g} {cell_area} Y=A*B; \n PIN *   NONINV {load} {max_load} {block_delay} {fanout_delay} {block_delay} {fanout_delay} \n')
+    elif g.split('_')[0] == 'or':
+      file.write(f'GATE {g} {cell_area} Y=A+B; \n PIN *   NONINV {load} {max_load} {block_delay} {fanout_delay} {block_delay} {fanout_delay} \n')
+    elif g.split('_')[0] == 'nand':
+      file.write(f'GATE {g} {cell_area} Y=!(A*B); \n PIN *   INV {load} {max_load} {block_delay} {fanout_delay} {block_delay} {fanout_delay} \n')
+      file.write(f'GATE {"not_"+g} {cell_area} Y=!A; \n PIN *   INV {load} {max_load} {block_delay} {fanout_delay} {block_delay} {fanout_delay} \n')
+    elif g.split('_')[0] == 'nor':
+      file.write(f'GATE {g} {cell_area} Y=!(A+B); \n PIN *   INV {load} {max_load} {block_delay} {fanout_delay} {block_delay} {fanout_delay} \n')
+      file.write(f'GATE {"not_"+g} {cell_area} Y=!A; \n PIN *   INV {load} {max_load} {block_delay} {fanout_delay} {block_delay} {fanout_delay} \n')
+    elif g.split('_')[0] == 'not':
+      file.write(f'GATE {g} {cell_area} Y=!A; \n PIN *   INV {load} {max_load} {block_delay} {fanout_delay} {block_delay} {fanout_delay} \n')
+    elif g.split('_')[0] == 'buf':
+      file.write(f'GATE {g} {cell_area} Y=A; \n PIN *   NONINV {load} {max_load} {block_delay} {fanout_delay} {block_delay} {fanout_delay} \n')
+    elif g.split('_')[0] == 'xor':
+      file.write(f'GATE {g} {cell_area} Y=!A*B+A*!B; \n PIN *   UNKNOWN {load} {max_load} {block_delay} {fanout_delay} {block_delay} {fanout_delay} \n')
+    elif g.split('_')[0] == 'xnor':
+      file.write(f'GATE {g} {cell_area} Y=!A*!B+A*B; \n PIN *   UNKNOWN {load} {max_load} {block_delay} {fanout_delay} {block_delay} {fanout_delay} \n')
+
+  num_genlib += 1
+
+print(f'genlib flies with attributes are generated')

@@ -10,7 +10,7 @@ import time
 # argument settings
 
 start_time = time.time()
-time_limit = 300 # * 60
+time_limit = 600 # * 60
 
 if len(sys.argv) != 8:
     print("Usage: SA_on_Techmap.py <estimator> <lib_file> <genlib_file> <min_cost> <output.v> <area_only> <deepsyn>")
@@ -151,6 +151,7 @@ while time.time() - start_time < time_limit:
 
 
     output = subprocess.check_output(["./abc", "-f", "./map1.script"])
+    output = subprocess.check_output(["./replace.sh", "-netlist", "./netlists/mapped_neighbor_design.v"])
     output = subprocess.check_output([e, "-library", lib, "-netlist", "./netlists/mapped_neighbor_design.v", "-output", "./design.out"])
     o = float(output.decode().split(' ')[2][:-1])
 
@@ -167,9 +168,6 @@ while time.time() - start_time < time_limit:
                 destination_file.write(content)
 
             print("Step:", s, "Cost:", o, gc, r%5, n)
-            check = subprocess.check_output([e, "-library", lib, "-netlist", output_v, "-output", "./neighbor.out"])
-            c = float(check.decode().split(' ')[2][:-1])
-            print("netlist cost:", c)
             best.clear()
             best = genlib_n
             best_val = o

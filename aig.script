@@ -1,0 +1,6 @@
+read_verilog netlists/design4.v
+strash
+&get -n
+&deepsyn -J 1000 -T 900 -v
+&put
+write_verilog dsyn_temp.aig

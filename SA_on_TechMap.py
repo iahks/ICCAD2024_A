@@ -10,11 +10,7 @@ import time
 # argument settings
 
 start_time = time.time()
-<<<<<<< HEAD
 time_limit = 3600 # one hour
-=======
-time_limit = 600 # * 60
->>>>>>> ee346ce9e951ab0feead131b8307032b1929aa61
 
 if len(sys.argv) != 8:
     print("Usage: SA_on_Techmap.py <estimator> <lib_file> <genlib_file> <min_cost> <output.v> <area_only> <deepsyn>")
@@ -175,14 +171,7 @@ while time.time() - start_time < time_limit:
             with open(output_v, 'w') as destination_file:
                 destination_file.write(content)
 
-<<<<<<< HEAD
             print("Downhill! @ Step:", s, "Cost:", o) #, gc, r%5, n)
-            # check = subprocess.check_output([e, "-library", lib, "-netlist", output_v, "-output", "./neighbor.out"])
-            # c = float(check.decode().split(' ')[2][:-1])
-            # print("netlist cost:", c)
-=======
-            print("Step:", s, "Cost:", o, gc, r%5, n)
->>>>>>> ee346ce9e951ab0feead131b8307032b1929aa61
             best.clear()
             best = genlib_n
             best_val = o

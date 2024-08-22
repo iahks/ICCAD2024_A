@@ -50,70 +50,29 @@ best, best_val = genlib.copy(), min_cost
 genlib_val = best_val
 # temp = 75 # initial cost
 
-if(area_only=="False" and deepsyn=="False"):
-    with open(f'./map1.script', 'w') as file:
-        file.write("""read_library ./genlibs/genlib_neighbor.genlib
-read_verilog temp.aig
+# Define common parts of the script
+common_script = """read_library ./genlibs/genlib_neighbor.genlib
+read_verilog {verilog_file}
 strash
 choice
-map
+map {map_options}
 choice
-map
+map {map_options}
 choice
-map
+map {map_options}
 choice
-map
+map {map_options}
 choice
-map
-write_verilog ./netlists/mapped_neighbor_design.v""")
-elif(area_only=="True" and deepsyn=="False"):
-    with open(f'./map1.script', 'w') as file:
-        file.write("""read_library ./genlibs/genlib_neighbor.genlib
-read_verilog temp.aig
-strash
-choice
-map -a
-choice
-map -a
-choice
-map -a
-choice
-map -a
-choice
-map -a
-write_verilog ./netlists/mapped_neighbor_design.v""")
-elif(area_only=="False" and deepsyn=="True"):
-    with open(f'./map1.script', 'w') as file:
-        file.write("""read_library ./genlibs/genlib_neighbor.genlib
-read_verilog dsyn_temp.aig
-strash
-choice
-map 
-choice
-map 
-choice
-map 
-choice
-map 
-choice
-map 
-write_verilog ./netlists/mapped_neighbor_design.v""")
-else:
-    with open(f'./map1.script', 'w') as file:
-        file.write("""read_library ./genlibs/genlib_neighbor.genlib
-read_verilog dsyn_temp.aig
-strash
-choice
-map -a
-choice
-map -a
-choice
-map -a
-choice
-map -a
-choice
-map -a
-write_verilog ./netlists/mapped_neighbor_design.v""")
+map {map_options}
+write_verilog ./netlists/mapped_neighbor_design.v"""
+
+# Determine the specific parameters based on the conditions
+verilog_file = 'dsyn_temp.aig' if deepsyn else 'temp.aig'
+map_options = '-a' if area_only else ''
+
+# Write the script to the file
+with open('./map1.script', 'w') as file:
+    file.write(common_script.format(verilog_file=verilog_file, map_options=map_options))
 
 s = 0
 d_avg = -5.4

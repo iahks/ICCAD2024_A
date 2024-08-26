@@ -1,5 +1,6 @@
 import random
 import numpy as np
+import json
 import subprocess
 import argparse
 import opentuner
@@ -91,6 +92,8 @@ class GenlibOpenTuner(MeasurementInterface):
         for gate in self.gates:
             for param in self.gate_params:
                 d[f'{gate}_{param}'] = self.genlib[gate][param]
+        with open("opentuner_init.json", "w") as outfile: 
+            json.dump(d, outfile)
         return d
     
     def write_script(self): 
@@ -163,4 +166,4 @@ if __name__ == "__main__":
           '--area_only', args.area_only, 
           '--deepsyn', args.deepsyn, 
           '--test-limit', '1000', 
-          '--no-dups', '--seed-configuration', './opentuner.json'])
+          '--no-dups', '--seed-configuration', './opentuner_init.json'])

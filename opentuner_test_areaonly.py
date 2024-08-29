@@ -1,7 +1,7 @@
 import random
 import numpy as np
 import json
-import os, subprocess
+import subprocess
 import argparse
 import opentuner
 from opentuner import ConfigurationManipulator
@@ -52,33 +52,49 @@ class GenlibOpenTuner(MeasurementInterface):
         self.estimator = self.args.cost_function
         self.lib = self.args.library
         self.gate_params = ['area', 'input_load', 'max_load', 'rise_block_delay', 'rise_fanout_delay', 'fall_block_delay', 'fall_fanout_delay']
-        self.minimum = float("inf")
+        self.gate_params_tuned = self.gate_params[0:1] if args.area_only else self.gate_params
 
-        self.gates = self.get_gates()
+        self.genlib = self.parse_genlib()
+        self.gates = list(self.genlib)
         self.init_params = self.get_init_params()
+        # print(self.init_params)
+        # print(cc)
 
         self.write_script()
 
     def manipulator(self): 
-        manipulator = ConfigurationManipulator()
+        manipulator = ConfigurationManipulator() # seed_config = self.init_params)
+        # self.config = manipulator.seed_config()
         for gate in self.gates:
-            for param in self.gate_params: 
+            for param in self.gate_params_tuned: 
                 fp = FloatParameter(f'{gate}_{param}', self.init_params[f'{gate}_{param}'] / 10, self.init_params[f'{gate}_{param}'] * 10)
                 manipulator.add_parameter(fp)
+                # fp.set_value(self.config, self.init_params[f'{gate}_{param}'])
+        # manipulator.seed_config = self.config
         
         return manipulator
+    
+    def parse_genlib(self): 
+        with open(self.args.genlib, "r") as f:
+            infile = f.read().splitlines()
 
-    def get_gates(self):
-        lib_file = open(self.lib, 'r')
-        lib = json.loads(lib_file.read())
-        # print("lib: ", lib)
-        gates =[cell["cell_name"] for cell in lib["cells"]]
-        return gates
+        genlib =  {}
+        for i in infile: 
+            ls = i.split(' ')
+            if (ls[0] == "GATE"): 
+                genlib[ls[1]] = {self.gate_params[0]: float(ls[2])}
+            else: 
+                genlib[list(genlib.keys())[-1]].update(dict(zip(self.gate_params[1:], map(float, ls[6:12]))))
+        return genlib
     
     def get_init_params(self): 
-        f = open(self.args.genlib)
-        data = json.load(f)
-        return data
+        d = {}
+        for gate in self.gates:
+            for param in self.gate_params:
+                d[f'{gate}_{param}'] = self.genlib[gate][param]
+        with open("opentuner_init.json", "w") as outfile: 
+            json.dump(d, outfile)
+        return d
     
     def write_script(self): 
         verilog_file = 'dsyn_temp.aig' if str2bool(self.args.deepsyn) else 'temp.aig'
@@ -92,8 +108,11 @@ class GenlibOpenTuner(MeasurementInterface):
                 gate_type = g.split('_')[0]
                 if gate_type in gate_definitions: 
                     formula, pin_type = gate_definitions[gate_type]
-                    prms = [f"{cfg[f'{g}_{p}']}" for p in self.gate_params[1:]]
-                    file.write(f"GATE {g} {cfg[f'{g}_{self.gate_params[0]}']} {formula} \n PIN *   {pin_type} {' '.join(prms)} \n")
+                    if args.area_only: 
+                        prms = [f"{self.init_params[f'{g}_{p}']}" for p in self.gate_params[1:]]
+                    else: 
+                        prms = [f"{cfg[f'{g}_{p}']}" for p in self.gate_params[1:]]
+                    file.write(f"GATE {g} {cfg[f'{g}_{self.gate_params_tuned[0]}']} {formula} \n PIN *   {pin_type} {' '.join(prms)} \n")
         
     def run(self, desired_result, input, limit): 
         cfg = desired_result.configuration.data
@@ -104,9 +123,6 @@ class GenlibOpenTuner(MeasurementInterface):
         output = subprocess.check_output([self.estimator, "-library", self.lib, "-netlist", "./netlists/mapped_neighbor_design.v", "-output", "./design.out"])
         o = float(output.decode().split(' ')[2][:-1])
         print("o:", o)
-        if o < self.minimum: 
-            os.rename('./genlibs/genlib_neighbor.genlib', './genlibs/genlib_best_from_opentuner.genlib')
-            self.minimum = o
         return Result(time=o)
     
     def save_final_config(self, configuration): 
@@ -116,12 +132,12 @@ class GenlibOpenTuner(MeasurementInterface):
 
 def main(args):
     argparser = opentuner.default_argparser()
-    argparser.add_argument('--cost_function', '-cf', type=str, required=True)
-    argparser.add_argument('--library', '-l', type=str, required=True)
-    argparser.add_argument('--genlib', '-g', type=str, required=True)
+    argparser.add_argument('--cost_function', type=str, required=True)
+    argparser.add_argument('--library', type=str, required=True)
+    argparser.add_argument('--genlib', type=str, required=True)
     # argparser.add_argument('--min_cost', type=str, required=True)
-    argparser.add_argument('--verilog', '-v', type=str, required=True)
-    argparser.add_argument('--area_only', '-a', type=str, required=True)
+    argparser.add_argument('--verilog', type=str, required=True)
+    argparser.add_argument('--area_only', type=str, required=True)
     argparser.add_argument('--deepsyn', type=str, required=True)
     
     args = argparser.parse_args(args)
@@ -136,13 +152,13 @@ if __name__ == "__main__":
     np.random.seed(seed)
 
     parser = argparse.ArgumentParser()
-    parser.add_argument('--cost_function', '-cf', type=str, required=True, help='Path to the cost function')
-    parser.add_argument('--library', '-l', type=str, required=True, help='Path to the library file')
-    parser.add_argument('--genlib', '-g', type=str, required=True, help='Path to the initial genlib json file')
+    parser.add_argument('--cost_function', type=str, required=True, help='Path to the cost function')
+    parser.add_argument('--library', type=str, required=True, help='Path to the library file')
+    parser.add_argument('--genlib', type=str, required=True, help='Path to the initial genlib file')
     # parser.add_argument('--min_cost', type=str, required=True, help='Minimum cost of previous result')
-    parser.add_argument('--verilog', '-v',  type=str, required=True, help='Path to the Output verilog file')
-    parser.add_argument('--area_only', '-a', type=str, required=True, help='Whether to use -a or not')
-    parser.add_argument('--deepsyn', '-d', type=str, required=True, help='Whether to use deepsyn result or not')
+    parser.add_argument('--verilog', type=str, required=True, help='Path to the Output verilog file')
+    parser.add_argument('--area_only', type=str, required=True, help='Whether to use -a or not')
+    parser.add_argument('--deepsyn', type=str, required=True, help='Whether to use deepsyn result or not')
     args = parser.parse_args()
 
     main(['--cost_function', args.cost_function, 
@@ -153,4 +169,4 @@ if __name__ == "__main__":
           '--area_only', args.area_only, 
           '--deepsyn', args.deepsyn, 
           '--test-limit', '1000', 
-          '--no-dups', '--seed-configuration', './opentuner_init0.json', '--seed-configuration', './opentuner_init1.json', '--seed-configuration', './opentuner_init2.json'])
+          '--no-dups', '--seed-configuration', './opentuner_init.json'])

@@ -62,3 +62,11 @@ tags
 /cmake
 /cscope
 abc.history
+
+genlibs/genlib_best_from_opentuner.genlib
+genlibs/genlib_neighbor.genlib
+netlists/mapped_neighbor_design.v
+netlists/sed*
+
+opentuner.log
+opentuner.db/

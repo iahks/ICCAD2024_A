@@ -51,7 +51,7 @@ class GenlibOpenTuner(MeasurementInterface):
 
         self.estimator = self.args.cost_function
         self.lib = self.args.library
-        self.gate_params = ['area', 'input_load', 'max_load', 'rise_block_delay', 'rise_fanout_delay', 'fall_block_delay', 'fall_fanout_delay']
+        self.gate_params = ['area', 'power', 'input_load', 'max_load', 'rise_block_delay', 'rise_fanout_delay', 'fall_block_delay', 'fall_fanout_delay']
         self.minimum = float("inf")
 
         self.gates = self.get_gates()
@@ -81,7 +81,7 @@ class GenlibOpenTuner(MeasurementInterface):
         return data
     
     def write_script(self): 
-        verilog_file = 'dsyn_temp.aig' if str2bool(self.args.deepsyn) else 'temp.aig'
+        verilog_file = 'dsyn_temp_6.aig' if str2bool(self.args.deepsyn) else 'temp.aig'
         map_options = '-a' if str2bool(self.args.area_only) else ''
         with open('./map1.script', 'w') as file:
             file.write(common_script.format(verilog_file=verilog_file, map_options=map_options))
@@ -92,8 +92,8 @@ class GenlibOpenTuner(MeasurementInterface):
                 gate_type = g.split('_')[0]
                 if gate_type in gate_definitions: 
                     formula, pin_type = gate_definitions[gate_type]
-                    prms = [f"{cfg[f'{g}_{p}']}" for p in self.gate_params[1:]]
-                    file.write(f"GATE {g} {cfg[f'{g}_{self.gate_params[0]}']} {formula} \n PIN *   {pin_type} {' '.join(prms)} \n")
+                    prms = [f"{cfg[f'{g}_{p}']}" for p in self.gate_params[2:]]
+                    file.write(f"GATE {g} {cfg[f'{g}_{self.gate_params[0]}']} {cfg[f'{g}_{self.gate_params[1]}']} {formula} \n PIN *   {pin_type} {' '.join(prms)} \n")
         
     def run(self, desired_result, input, limit): 
         cfg = desired_result.configuration.data
@@ -153,4 +153,4 @@ if __name__ == "__main__":
           '--area_only', args.area_only, 
           '--deepsyn', args.deepsyn, 
           '--test-limit', '1000', 
-          '--no-dups', '--seed-configuration', './opentuner_init0.json', '--seed-configuration', './opentuner_init1.json', '--seed-configuration', './opentuner_init2.json'])
+          '--no-dups', '--seed-configuration', './opentuner_init0.json', '--seed-configuration', './opentuner_init1.json', '--seed-configuration', './opentuner_init2.json']) #, '--technique', 'UniformGreedyMutation05', '--technique', 'UniformGreedyMutation10', '--technique', 'UniformGreedyMutation20'])

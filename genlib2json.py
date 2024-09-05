@@ -30,3 +30,6 @@ for genlib_file in ["./genlibs/genlib1.genlib", "./genlibs/genlib1.genlib", "./g
     genlib = parse_genlib(genlib_file)
     gates = list(genlib)
     get_init_params(gates, genlib, n)
+    
+with open("gates.json", "w") as outfile: 
+    json.dump(gates, outfile)

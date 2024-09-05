@@ -69,10 +69,8 @@ class GenlibOpenTuner(MeasurementInterface):
         return manipulator
 
     def get_gates(self):
-        lib_file = open(self.lib, 'r')
-        lib = json.loads(lib_file.read())
-        # print("lib: ", lib)
-        gates =[cell["cell_name"] for cell in lib["cells"]]
+        lib_file = open("./gates.json", 'r')
+        gates = json.loads(lib_file.read())
         return gates
     
     def get_init_params(self): 
